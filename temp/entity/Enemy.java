@@ -26,7 +26,7 @@ public class Enemy extends Entity {
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
 				 int detectRange, boolean roaming) {
-		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed);
+		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed, 100f);
 		this.aggressive = aggressive;
 		this.detectRange = detectRange;
 		roamX = x;
@@ -45,6 +45,7 @@ public class Enemy extends Entity {
 		}
 		if (target != null && aggressive) {
 			chaseTarget();
+			
 		}
 		checkTexture();
 	}

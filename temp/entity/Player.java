@@ -22,11 +22,10 @@ public class Player extends Entity {
 	
 	public static final int SIZE = 32;
 	public boolean attacking = false;
-	public float attackRange = 100f;
 	public float mouseAngle;
 
 	public Player() {
-		initEntity(Display.getWidth() / 2 - SIZE / 2, Display.getHeight() / 2 - SIZE / 2, SIZE, SIZE, "player/player", true, 1.5f);
+		initEntity(Display.getWidth() / 2 - SIZE / 2, Display.getHeight() / 2 - SIZE / 2, SIZE, SIZE, "player/player", true, 1.5f, 100f);
 	}
 	
 	public void getInput() {
@@ -57,7 +56,7 @@ public class Player extends Entity {
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
-					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 128, true));
+					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, true));
 				}
 			}
 		}
@@ -65,8 +64,8 @@ public class Player extends Entity {
 			if (Mouse.getEventButtonState()) {
 				if (Mouse.getEventButton() == 0) {
 					for (GameObject go : Main.game.currentObjects) {
-						if (go != this && Utils.isCollidingWithSector(go, this)) {
-							Main.game.objectsToDelete.add(go);
+						if (go != this && go instanceof Enemy && Utils.isCollidingWithSector(go, this)) {
+							((Enemy)go).die();
 						}
 					}
 				}

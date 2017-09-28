@@ -12,15 +12,17 @@ public abstract class Entity extends GameObject {
 	public float xMoveVector;
 	public float yMoveVector;
 	public float moveSpeed;
+	public float attackRange;
 	public float speedFactor;
 	public String[] textureNameArray;
 	public Texture[] textureArray;
 
-	public void initEntity(float x, float y, int width, int height, String textureNameArrayPrefix, boolean solid, float moveSpeed) {
+	public void initEntity(float x, float y, int width, int height, String textureNameArrayPrefix, boolean solid, float moveSpeed, float attackRange) {
 		setTextureNameArray(textureNameArrayPrefix);
 		loadTextureArray(textureNameArray);
 		initGameObject(x, y, 0.5f, width, height, "entity/" + textureNameArray[4], solid);
 		this.moveSpeed = moveSpeed;
+		this.attackRange = attackRange;
 		speedFactor = 1;
 	}
 	
