@@ -1,5 +1,7 @@
 package temp.entity;
 
+import static org.lwjgl.opengl.GL11.glColor3f;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -17,12 +19,19 @@ public class Enemy extends Entity {
 	private int detectRange;
 	private boolean roaming;
 	
-	private static final float ROAM_SPEED_FACTOR = 0.5f;
-	private static final int ROAM_MAX_PAUSE_TIME = 3;
+	private final float ROAM_SPEED_FACTOR = 0.5f;
+	private final int ROAM_MAX_PAUSE_TIME = 3;
 	private float roamX;
 	private float roamY;
 	private float roamDelay;
 	private double roamDelayTimer;
+	
+	private boolean attacking;
+	private final float ATTACK_SPEED = 1f;
+	private final float WIND_UP_TIME = 0.5f;
+	private final float ATTACK_TIME = 0.1f;
+	private float aimingAngle;
+	private double attackDelayTimer;
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
 				 int detectRange, boolean roaming) {
@@ -32,6 +41,8 @@ public class Enemy extends Entity {
 		roamX = x;
 		roamY = y;
 		roamDelay = 1f;
+		attacking = false;
+		attackDelayTimer = 50f;
 	}
 	
 	public void update() {
@@ -45,16 +56,33 @@ public class Enemy extends Entity {
 		}
 		if (target != null && aggressive) {
 			chaseTarget();
-			
+			attemptAttack();
 		}
 		checkTexture();
 	}
 	
+	public void render() {
+		if (attacking) {
+			if (attackDelayTimer >= WIND_UP_TIME && attackDelayTimer <= WIND_UP_TIME + ATTACK_TIME) {
+				glColor3f(1, 0, 0);
+			}
+			Utils.drawSector(x + width / 2, y + height / 2, -0.1f, attackRange,
+					 		 Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2), 90f);
+		}
+		glColor3f(1, 1, 1);
+		
+		Utils.drawQuadTex(texture, x, y, z, width, height);
+	}
+	
 	private void chaseTarget() {
 		ArrayList<GameObject> collidingWith = Utils.collidesWith(this);
+		/*
+		 * I think this section is old code and unnecessary as the player is now included in the list of currently existing objects
+		 * 
 		if (Utils.isColliding(this, target)) {
 			collidingWith.add(target);
 		}
+		*/
 		if (collidingWith.size() == 0 || !Utils.isCollidingWithSolids(this)) {
 			chase();
 			collidingWith = Utils.collidesWith(this);
@@ -71,6 +99,21 @@ public class Enemy extends Entity {
 			}
 		} else {
 			System.out.println("Error: enemy should not be colliding with any solid objects when the frame updates");
+		}
+	}
+	
+	private void attemptAttack() {
+		if (attackDelayTimer >= 1f / ATTACK_SPEED && !attacking) {
+			if (Utils.isCollidingWithSector(target, this,
+				Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
+				attacking = true;
+				attackDelayTimer = 0;
+			}
+		} else {
+			attackDelayTimer += (double)Time.getDifference() / 1000000000;
+		}
+		if (attacking && attackDelayTimer >= WIND_UP_TIME + ATTACK_TIME) {
+			attacking = false;
 		}
 	}
 	

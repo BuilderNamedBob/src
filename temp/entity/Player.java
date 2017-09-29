@@ -56,7 +56,7 @@ public class Player extends Entity {
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
-					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, true));
+					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 0.5f, true, 1000, true));
 				}
 			}
 		}
@@ -64,7 +64,7 @@ public class Player extends Entity {
 			if (Mouse.getEventButtonState()) {
 				if (Mouse.getEventButton() == 0) {
 					for (GameObject go : Main.game.currentObjects) {
-						if (go != this && go instanceof Enemy && Utils.isCollidingWithSector(go, this)) {
+						if (go != this && go instanceof Enemy && Utils.isCollidingWithSector(go, this, mouseAngle)) {
 							((Enemy)go).die();
 						}
 					}
@@ -85,28 +85,14 @@ public class Player extends Entity {
 		if (attacking) {
 			glColor3f(1, 0, 0);
 		}
-		
-		
 		Utils.drawSector(x + SIZE / 2, y + SIZE / 2, 0f, attackRange, mouseAngle, 90f);
-		
 		glColor3f(1, 1, 1);
+		
 		Utils.drawQuadTex(texture, x, y, z, width, height);
 	}
 	
 	private void updateMouseAngle() {
-		float yDifference = Mouse.getY() - (y + SIZE / 2);
-		float xDifference = Mouse.getX() - (x + SIZE / 2);
-		
-		float tanTheta = yDifference / xDifference;
-		float angle = (float)Math.toDegrees(Math.atan(-yDifference / xDifference));
-		
-		if (xDifference <= 0) {
-			angle -= 90;
-		} else {
-			angle += 90;
-		}
-		
-		mouseAngle = angle;
+		mouseAngle = Utils.calculateAngle(x + SIZE / 2, y + SIZE / 2, (float)Mouse.getX(), (float)Mouse.getY());
 	}
 	
 	private void act() {

@@ -10,11 +10,13 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.geom.Ellipse2D;
 
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
 import temp.engine.Main;
+import temp.entity.Entity;
 import temp.entity.Player;
 import temp.gameobject.GameObject;
 
@@ -26,6 +28,7 @@ public final class Utils {
 	
 	private static Random random = new Random();
 	
+	//generates an integer between 0 (inclusive) and maxBound (exclusive)
 	public static int genRandomNumber(int maxBound) {
 		return random.nextInt(maxBound);
 	}
@@ -154,26 +157,24 @@ public final class Utils {
 	}
 	*/
 	
-	public static boolean isCollidingWithSector(GameObject go1, Player player) {
-		float xCentre = player.x + player.width / 2;
-		float yCentre = player.y + player.height / 2;
+	public static boolean isCollidingWithSector(GameObject target, Entity attacker, float angle) {
+		float xCentre = attacker.x + attacker.width / 2;
+		float yCentre = attacker.y + attacker.height / 2;
 		
 		ArrayList<Integer> xPoints = new ArrayList<Integer>();
 		ArrayList<Integer> yPoints = new ArrayList<Integer>();
 		
-		float angle = player.mouseAngle;
-		
 		xPoints.add((int)xCentre);
 		yPoints.add((int)yCentre);
 		
-		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle - 45)) * player.attackRange));
-		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle - 45)) * player.attackRange));
+		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle - 45)) * attacker.attackRange));
+		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle - 45)) * attacker.attackRange));
 		
-		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle)) * player.attackRange * (float)Math.sqrt(2)));
-		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle)) * player.attackRange * (float)Math.sqrt(2)));
+		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle)) * attacker.attackRange * (float)Math.sqrt(2)));
+		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle)) * attacker.attackRange * (float)Math.sqrt(2)));
 		
-		xPoints.add((int)(xCentre + (float)Math.cos(Math.toRadians(45 - angle)) * player.attackRange));
-		yPoints.add((int)(yCentre + (float)Math.sin(Math.toRadians(45 - angle)) * player.attackRange));
+		xPoints.add((int)(xCentre + (float)Math.cos(Math.toRadians(45 - angle)) * attacker.attackRange));
+		yPoints.add((int)(yCentre + (float)Math.sin(Math.toRadians(45 - angle)) * attacker.attackRange));
 		
 		int arraySize = xPoints.size();
 		int[] xPointsArray = new int[arraySize];
@@ -184,11 +185,11 @@ public final class Utils {
 		}
 		
 		//Circle of radius attackRange around the player
-		Ellipse2D e = new Ellipse2D.Float(xCentre - player.attackRange, yCentre - player.attackRange, player.attackRange * 2, player.attackRange * 2);
+		Ellipse2D e = new Ellipse2D.Float(xCentre - attacker.attackRange, yCentre - attacker.attackRange, attacker.attackRange * 2, attacker.attackRange * 2);
 		//Rotated square of side length attackRange
 		Polygon p = new Polygon(xPointsArray, yPointsArray, arraySize);
 		//Rectangle representing enemy hitbox
-		Rectangle r = new Rectangle((int)go1.x, (int)go1.y, go1.width, go1.height);
+		Rectangle r = new Rectangle((int)target.x, (int)target.y, target.width, target.height);
 		
 		if (p.intersects(r) && e.intersects(r)) {
 			return true;
@@ -256,6 +257,22 @@ public final class Utils {
 		float go2X = go2.x + go2.width / 2;
 		float go2Y = go2.y + go2.height / 2;
 		return (float)Math.sqrt(Math.pow(go2X - go1X, 2) + Math.pow(go2Y - go1Y, 2));
+	}
+	
+	//Calculates the angle in degrees between an origin and a point relative to north, moving clockwise
+	public static float calculateAngle(float originX, float originY, float pointX, float pointY) {
+		float yDifference = pointY - originY;
+		float xDifference = pointX - originX;
+		
+		float angle = (float)Math.toDegrees(Math.atan(-yDifference / xDifference));
+		
+		if (xDifference <= 0) {
+			angle -= 90;
+		} else {
+			angle += 90;
+		}
+		
+		return angle;
 	}
 	
 	public static boolean bottomLeftCornerIntersects(GameObject go1, GameObject go2) {
