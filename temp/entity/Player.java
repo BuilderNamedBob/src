@@ -25,7 +25,7 @@ public class Player extends Entity {
 	public float mouseAngle;
 
 	public Player() {
-		initEntity(Display.getWidth() / 2 - SIZE / 2, Display.getHeight() / 2 - SIZE / 2, SIZE, SIZE, "player/player", true, 1.5f, 100f);
+		initEntity(Display.getWidth() / 2 - SIZE / 2, Display.getHeight() / 2 - SIZE / 2, SIZE, SIZE, "player/player", true, 1.5f, 100f, 100);
 	}
 	
 	public void getInput() {
@@ -56,7 +56,7 @@ public class Player extends Entity {
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
-					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 0.5f, true, 1000, true));
+					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, 100f, 100));
 				}
 			}
 		}
@@ -64,8 +64,8 @@ public class Player extends Entity {
 			if (Mouse.getEventButtonState()) {
 				if (Mouse.getEventButton() == 0) {
 					for (GameObject go : Main.game.currentObjects) {
-						if (go != this && go instanceof Enemy && Utils.isCollidingWithSector(go, this, mouseAngle)) {
-							((Enemy)go).die();
+						if (go != this && go instanceof Entity && Utils.isCollidingWithSector(go, this, mouseAngle)) {
+							((Entity)go).takeDamage(50);
 						}
 					}
 				}
@@ -74,6 +74,7 @@ public class Player extends Entity {
 	}
 	
 	public void update() {
+		checkDeath();
 		updateMouseAngle();
 		act();
 		checkFlags();
@@ -82,10 +83,12 @@ public class Player extends Entity {
 	
 	//This method can be removed when it matches the method it is overriding in the GameObject class
 	public void render() {
+		renderHealthBars(64, 4);
+		
 		if (attacking) {
 			glColor3f(1, 0, 0);
 		}
-		Utils.drawSector(x + SIZE / 2, y + SIZE / 2, 0f, attackRange, mouseAngle, 90f);
+		Utils.drawSector(x + SIZE / 2, y + SIZE / 2, -0.2f, attackRange, mouseAngle, 90f);
 		glColor3f(1, 1, 1);
 		
 		Utils.drawQuadTex(texture, x, y, z, width, height);

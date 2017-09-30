@@ -1,9 +1,13 @@
 package temp.entity;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import java.util.ArrayList;
 
 import org.newdawn.slick.opengl.Texture;
 
+import temp.engine.Main;
+import temp.game.Game;
 import temp.gameobject.GameObject;
 import temp.utils.Utils;
 
@@ -11,19 +15,54 @@ public abstract class Entity extends GameObject {
 	
 	public float xMoveVector;
 	public float yMoveVector;
+	public float speedFactor;
+	
+	public int currentHealth;
+	public int maxHealth;
 	public float moveSpeed;
 	public float attackRange;
-	public float speedFactor;
 	public String[] textureNameArray;
 	public Texture[] textureArray;
 
-	public void initEntity(float x, float y, int width, int height, String textureNameArrayPrefix, boolean solid, float moveSpeed, float attackRange) {
+	public void initEntity(float x, float y, int width, int height, String textureNameArrayPrefix,
+						   boolean solid, float moveSpeed, float attackRange, int maxHealth) {
 		setTextureNameArray(textureNameArrayPrefix);
 		loadTextureArray(textureNameArray);
-		initGameObject(x, y, 0.5f, width, height, "entity/" + textureNameArray[4], solid);
+		initGameObject(x, y, 0f, width, height, "entity/" + textureNameArray[4], solid);
 		this.moveSpeed = moveSpeed;
 		this.attackRange = attackRange;
+		this.maxHealth = maxHealth;
+		currentHealth = maxHealth;
 		speedFactor = 1;
+	}
+	
+	public void renderHealthBars(int healthBarWidth, int healthBarHeight) {
+		glColor3f(1, 0, 0);
+		Utils.drawQuad(x + (width - healthBarWidth) / 2, y + height * 1.5f, -0.1f, healthBarWidth, healthBarHeight);
+		
+		glColor3f(0, 1, 0);
+		float percentageHealth = (float)currentHealth / maxHealth;
+		if (percentageHealth < 0) {
+			percentageHealth = 0;
+		}
+		Utils.drawQuad(x + (width - healthBarWidth) / 2, y + height * 1.5f, -0.05f,
+					   (int)(healthBarWidth * percentageHealth), healthBarHeight);
+		
+		glColor3f(1, 1, 1);
+	}
+	
+	public void takeDamage(int damage) {
+		currentHealth -= damage;
+	}
+	
+	public void checkDeath() {
+		if (currentHealth <= 0) {
+			if (this instanceof Enemy) {
+				Main.game.objectsToDelete.add(this);
+			} else if (this instanceof Player) {
+				Main.game = new Game();
+			}
+		}
 	}
 	
 	public void setTextureNameArray(String prefix) {

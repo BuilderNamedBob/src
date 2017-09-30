@@ -34,12 +34,16 @@ public final class Utils {
 	}
 	
 	public static void drawQuad(float x, float y, float z, int width, int height) {
+		glDisable(GL_TEXTURE_2D);
+		
 		glBegin(GL_QUADS);
-		glVertex2f(x, y);
-		glVertex2f(x + width, y);
-		glVertex2f(x + width, y + height);
-		glVertex2f(x, y + height);
+		glVertex3f(x, y, z);
+		glVertex3f(x + width, y, z);
+		glVertex3f(x + width, y + height, z);
+		glVertex3f(x, y + height, z);
 		glEnd();
+		
+		glEnable(GL_TEXTURE_2D);
 	}
 	
 	
@@ -50,6 +54,7 @@ public final class Utils {
 		float y2;
 		
 		glDisable(GL_TEXTURE_2D);
+		
 		glBegin(GL_TRIANGLE_FAN);
 		
 		glVertex3f(x1, y1, z);

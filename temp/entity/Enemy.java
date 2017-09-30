@@ -1,6 +1,6 @@
 package temp.entity;
 
-import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -29,13 +29,13 @@ public class Enemy extends Entity {
 	private boolean attacking;
 	private final float ATTACK_SPEED = 1f;
 	private final float WIND_UP_TIME = 0.5f;
-	private final float ATTACK_TIME = 0.1f;
+	private final float ATTACK_TIME = 0.05f;
 	private float aimingAngle;
 	private double attackDelayTimer;
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
-				 int detectRange, boolean roaming) {
-		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed, 100f);
+				 int detectRange, boolean roaming, float attackRange, int maxHealth) {
+		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed, attackRange, maxHealth);
 		this.aggressive = aggressive;
 		this.detectRange = detectRange;
 		roamX = x;
@@ -46,6 +46,7 @@ public class Enemy extends Entity {
 	}
 	
 	public void update() {
+		checkDeath();
 		if (target == null) {
 			if (Utils.calculateDistanceFromCentre(this, Main.game.player) < detectRange && aggressive) {
 				target = Main.game.player;
@@ -62,11 +63,13 @@ public class Enemy extends Entity {
 	}
 	
 	public void render() {
+		renderHealthBars(64, 4);
+		
 		if (attacking) {
 			if (attackDelayTimer >= WIND_UP_TIME && attackDelayTimer <= WIND_UP_TIME + ATTACK_TIME) {
 				glColor3f(1, 0, 0);
 			}
-			Utils.drawSector(x + width / 2, y + height / 2, -0.1f, attackRange,
+			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, attackRange,
 					 		 Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2), 90f);
 		}
 		glColor3f(1, 1, 1);
@@ -113,6 +116,10 @@ public class Enemy extends Entity {
 			attackDelayTimer += (double)Time.getDifference() / 1000000000;
 		}
 		if (attacking && attackDelayTimer >= WIND_UP_TIME + ATTACK_TIME) {
+			if (Utils.isCollidingWithSector(target, this,
+					Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
+				Main.game.player.takeDamage(20);
+			}
 			attacking = false;
 		}
 	}
