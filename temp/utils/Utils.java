@@ -46,8 +46,6 @@ public final class Utils {
 		glEnable(GL_TEXTURE_2D);
 	}
 	
-	
-	
 	public static void drawSector(float x1, float y1, float z, float radius, float centreAngle, float width) 
 	{
 		float x2;

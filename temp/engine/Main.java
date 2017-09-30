@@ -61,7 +61,7 @@ public final class Main {
 		glEnable(GL_BLEND);
 		glEnable(GL_DEPTH_TEST);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glClearColor(0, 0, 0, 1);
+		glClearColor(61/255f, 124/255f, 160/255f, 1);
 		glColor3f(1, 1, 1);
 	}
 	
