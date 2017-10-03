@@ -17,20 +17,20 @@ public abstract class Entity extends GameObject {
 	public float yMoveVector;
 	public float speedFactor;
 	
+	public Weapon weapon;
 	public int currentHealth;
 	public int maxHealth;
 	public float moveSpeed;
-	public float attackRange;
 	public String[] textureNameArray;
 	public Texture[] textureArray;
 
 	public void initEntity(float x, float y, int width, int height, String textureNameArrayPrefix,
-						   boolean solid, float moveSpeed, float attackRange, int maxHealth) {
+						   boolean solid, float moveSpeed, Weapon weapon, int maxHealth) {
 		setTextureNameArray(textureNameArrayPrefix);
 		loadTextureArray(textureNameArray);
 		initGameObject(x, y, 0f, width, height, "entity/" + textureNameArray[4], solid);
 		this.moveSpeed = moveSpeed;
-		this.attackRange = attackRange;
+		this.weapon = weapon;
 		this.maxHealth = maxHealth;
 		currentHealth = maxHealth;
 		speedFactor = 1;

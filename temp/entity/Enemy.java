@@ -27,15 +27,12 @@ public class Enemy extends Entity {
 	private double roamDelayTimer;
 	
 	private boolean attacking;
-	private final float ATTACK_SPEED = 1f;
-	private final float WIND_UP_TIME = 0.5f;
-	private final float ATTACK_TIME = 0.05f;
 	private float aimingAngle;
 	private double attackDelayTimer;
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
-				 int detectRange, boolean roaming, float attackRange, int maxHealth) {
-		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed, attackRange, maxHealth);
+				 int detectRange, boolean roaming, Weapon weapon, int maxHealth) {
+		initEntity(x, y, size, size, "enemy/enemy", solid, moveSpeed, weapon, maxHealth);
 		this.aggressive = aggressive;
 		this.detectRange = detectRange;
 		roamX = x;
@@ -66,10 +63,10 @@ public class Enemy extends Entity {
 		renderHealthBars(64, 4);
 		
 		if (attacking) {
-			if (attackDelayTimer >= WIND_UP_TIME && attackDelayTimer <= WIND_UP_TIME + ATTACK_TIME) {
+			if (attackDelayTimer >= weapon.windUpTime && attackDelayTimer <= weapon.windUpTime + weapon.attackTime) {
 				glColor3f(1, 0, 0);
 			}
-			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, attackRange,
+			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, weapon.attackRange,
 					 		 Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2), 90f);
 		}
 		glColor3f(1, 1, 1);
@@ -106,7 +103,7 @@ public class Enemy extends Entity {
 	}
 	
 	private void attemptAttack() {
-		if (attackDelayTimer >= 1f / ATTACK_SPEED && !attacking) {
+		if (attackDelayTimer >= 1f / weapon.attackSpeed && !attacking) {
 			if (Utils.isCollidingWithSector(target, this,
 				Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
 				attacking = true;
@@ -115,10 +112,10 @@ public class Enemy extends Entity {
 		} else {
 			attackDelayTimer += (double)Time.getDifference() / 1000000000;
 		}
-		if (attacking && attackDelayTimer >= WIND_UP_TIME + ATTACK_TIME) {
+		if (attacking && attackDelayTimer >= weapon.windUpTime + weapon.attackTime) {
 			if (Utils.isCollidingWithSector(target, this,
 					Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
-				Main.game.player.takeDamage(20);
+				Main.game.player.takeDamage(weapon.damage);
 			}
 			attacking = false;
 		}

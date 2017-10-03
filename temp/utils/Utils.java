@@ -170,14 +170,14 @@ public final class Utils {
 		xPoints.add((int)xCentre);
 		yPoints.add((int)yCentre);
 		
-		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle - 45)) * attacker.attackRange));
-		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle - 45)) * attacker.attackRange));
+		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle - 45)) * attacker.weapon.attackRange));
+		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle - 45)) * attacker.weapon.attackRange));
 		
-		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle)) * attacker.attackRange * (float)Math.sqrt(2)));
-		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle)) * attacker.attackRange * (float)Math.sqrt(2)));
+		xPoints.add((int)(xCentre + (float)Math.sin(Math.toRadians(angle)) * attacker.weapon.attackRange * (float)Math.sqrt(2)));
+		yPoints.add((int)(yCentre + (float)Math.cos(Math.toRadians(angle)) * attacker.weapon.attackRange * (float)Math.sqrt(2)));
 		
-		xPoints.add((int)(xCentre + (float)Math.cos(Math.toRadians(45 - angle)) * attacker.attackRange));
-		yPoints.add((int)(yCentre + (float)Math.sin(Math.toRadians(45 - angle)) * attacker.attackRange));
+		xPoints.add((int)(xCentre + (float)Math.cos(Math.toRadians(45 - angle)) * attacker.weapon.attackRange));
+		yPoints.add((int)(yCentre + (float)Math.sin(Math.toRadians(45 - angle)) * attacker.weapon.attackRange));
 		
 		int arraySize = xPoints.size();
 		int[] xPointsArray = new int[arraySize];
@@ -188,7 +188,8 @@ public final class Utils {
 		}
 		
 		//Circle of radius attackRange around the player
-		Ellipse2D e = new Ellipse2D.Float(xCentre - attacker.attackRange, yCentre - attacker.attackRange, attacker.attackRange * 2, attacker.attackRange * 2);
+		Ellipse2D e = new Ellipse2D.Float(xCentre - attacker.weapon.attackRange, yCentre - attacker.weapon.attackRange,
+										  attacker.weapon.attackRange * 2, attacker.weapon.attackRange * 2);
 		//Rotated square of side length attackRange
 		Polygon p = new Polygon(xPointsArray, yPointsArray, arraySize);
 		//Rectangle representing enemy hitbox
