@@ -2,26 +2,21 @@ package temp.entity;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjgl.opengl.Display;
-import org.newdawn.slick.opengl.Texture;
-
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import temp.engine.Main;
 import temp.game.Time;
-import temp.utils.Utils;
 import temp.gameobject.GameObject;
+import temp.utils.Utils;
 
 public class Player extends Entity {
 	
 	public static final int SIZE = 32;
-	public boolean attacking = false;
+	public boolean attackFlag = false;
 	public float mouseAngle;
 
 	public Player() {
@@ -43,11 +38,6 @@ public class Player extends Entity {
 		} else {
 			xMoveVector = 0;
 		}
-		if (Mouse.isButtonDown(0)) {
-			attacking = true;
-		} else {
-			attacking = false;
-		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
@@ -56,18 +46,14 @@ public class Player extends Entity {
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
-					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, Weapon.WARHAMMER, 100));
+					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, Weapon.SWORD, 100));
 				}
 			}
 		}
 		while (Mouse.next()) {
 			if (Mouse.getEventButtonState()) {
 				if (Mouse.getEventButton() == 0) {
-					for (GameObject go : Main.game.currentObjects) {
-						if (go != this && go instanceof Entity && Utils.isCollidingWithSector(go, this, mouseAngle)) {
-							((Entity)go).takeDamage(weapon.damage);
-						}
-					}
+					attackFlag = true;
 				}
 			}
 		}
@@ -77,6 +63,7 @@ public class Player extends Entity {
 		checkDeath();
 		updateMouseAngle();
 		act();
+		handleAttack();
 		checkFlags();
 		checkTexture();
 	}
@@ -84,12 +71,7 @@ public class Player extends Entity {
 	//This method can be removed when it matches the method it is overriding in the GameObject class
 	public void render() {
 		renderHealthBars(64, 4);
-		
-		if (attacking) {
-			glColor3f(1, 0, 0);
-		}
-		Utils.drawSector(x + SIZE / 2, y + SIZE / 2, -0.2f, weapon.attackRange, mouseAngle, 90f);
-		glColor3f(1, 1, 1);
+		renderTargetSector(mouseAngle);
 		
 		Utils.drawQuadTex(texture, x, y, z, width, height);
 	}
@@ -137,7 +119,19 @@ public class Player extends Entity {
 		}
 	}
 	
+	private void handleAttack() {
+		ArrayList<Entity> targetList = new ArrayList<Entity>();
+		for (GameObject go : Main.game.currentObjects) {
+			if (go != this && go instanceof Entity && Utils.isCollidingWithSector(go, this, mouseAngle)) {
+				targetList.add((Entity)go);
+			}
+		}
+		attemptAttack(attackFlag, true, targetList);
+		System.out.println(attackFlag);
+	}
+	
 	private void checkFlags() {
+		attackFlag = false;
 		/*
 		Item firstItemInInventory = inventory.getContents()[0];
 		if (dropFlag && firstItemInInventory != null) {
@@ -186,4 +180,5 @@ public class Player extends Entity {
 		}
 	}
 	*/
+	
 }

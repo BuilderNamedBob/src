@@ -8,6 +8,7 @@ import org.newdawn.slick.opengl.Texture;
 
 import temp.engine.Main;
 import temp.game.Game;
+import temp.game.Time;
 import temp.gameobject.GameObject;
 import temp.utils.Utils;
 
@@ -18,9 +19,13 @@ public abstract class Entity extends GameObject {
 	public float speedFactor;
 	
 	public Weapon weapon;
+	public boolean attacking;
+	public float attackDelayTimer;
+	
 	public int currentHealth;
 	public int maxHealth;
 	public float moveSpeed;
+	public float attackRange;
 	public String[] textureNameArray;
 	public Texture[] textureArray;
 
@@ -34,6 +39,35 @@ public abstract class Entity extends GameObject {
 		this.maxHealth = maxHealth;
 		currentHealth = maxHealth;
 		speedFactor = 1;
+	}
+	
+	public void attemptAttack(boolean triggerCondition, boolean damageCondition, ArrayList<Entity> damageRecipients) {
+		if (attackDelayTimer >= 1f / weapon.attackSpeed && !attacking) {
+			if (triggerCondition) {
+				attacking = true;
+				attackDelayTimer = 0;
+			}
+		} else {
+			attackDelayTimer += (double)Time.getDifference() / 1000000000;
+		}
+		if (attacking && attackDelayTimer >= weapon.windUpTime + weapon.attackTime) { //damage registers when they finish their swing
+			if (damageCondition) {
+				for (Entity e : damageRecipients) {
+					e.takeDamage(weapon.damage);
+				}
+			}
+			attacking = false;
+		}
+	}
+	
+	public void renderTargetSector(float angle) {
+		if (attacking) {
+			if (attackDelayTimer >= weapon.windUpTime && attackDelayTimer <= weapon.windUpTime + weapon.attackTime) {
+				glColor3f(1, 0, 0);
+			}
+			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, weapon.attackRange, angle, 90f);
+		}
+		glColor3f(1, 1, 1);
 	}
 	
 	public void renderHealthBars(int healthBarWidth, int healthBarHeight) {

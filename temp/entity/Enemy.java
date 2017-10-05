@@ -3,14 +3,13 @@ package temp.entity;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.lwjgl.opengl.Display;
 
 import temp.engine.Main;
 import temp.game.Time;
-import temp.utils.Utils;
 import temp.gameobject.GameObject;
+import temp.utils.Utils;
 
 public class Enemy extends Entity {
 	
@@ -26,9 +25,6 @@ public class Enemy extends Entity {
 	private float roamDelay;
 	private double roamDelayTimer;
 	
-	private boolean attacking;
-	private float aimingAngle;
-	private double attackDelayTimer;
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
 				 int detectRange, boolean roaming, Weapon weapon, int maxHealth) {
@@ -54,24 +50,24 @@ public class Enemy extends Entity {
 		}
 		if (target != null && aggressive) {
 			chaseTarget();
-			attemptAttack();
+			handleAttack();
 		}
 		checkTexture();
 	}
 	
 	public void render() {
 		renderHealthBars(64, 4);
-		
-		if (attacking) {
-			if (attackDelayTimer >= weapon.windUpTime && attackDelayTimer <= weapon.windUpTime + weapon.attackTime) {
-				glColor3f(1, 0, 0);
-			}
-			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, weapon.attackRange,
-					 		 Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2), 90f);
-		}
-		glColor3f(1, 1, 1);
+		renderTargetSector(Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2));
 		
 		Utils.drawQuadTex(texture, x, y, z, width, height);
+	}
+	
+	private void handleAttack() {
+		boolean targetWithinRange = Utils.isCollidingWithSector(target, this,
+				Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2));
+		ArrayList<Entity> targetAsList = new ArrayList<Entity>();
+		targetAsList.add(target);
+		attemptAttack(targetWithinRange, targetWithinRange, targetAsList);
 	}
 	
 	private void chaseTarget() {
@@ -99,25 +95,6 @@ public class Enemy extends Entity {
 			}
 		} else {
 			System.out.println("Error: enemy should not be colliding with any solid objects when the frame updates");
-		}
-	}
-	
-	private void attemptAttack() {
-		if (attackDelayTimer >= 1f / weapon.attackSpeed && !attacking) {
-			if (Utils.isCollidingWithSector(target, this,
-				Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
-				attacking = true;
-				attackDelayTimer = 0;
-			}
-		} else {
-			attackDelayTimer += (double)Time.getDifference() / 1000000000;
-		}
-		if (attacking && attackDelayTimer >= weapon.windUpTime + weapon.attackTime) {
-			if (Utils.isCollidingWithSector(target, this,
-					Utils.calculateAngle(x + width / 2, y + height / 2, target.x + target.width / 2, target.y + target.height / 2))) {
-				Main.game.player.takeDamage(weapon.damage);
-			}
-			attacking = false;
 		}
 	}
 	
