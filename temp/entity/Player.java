@@ -127,7 +127,6 @@ public class Player extends Entity {
 			}
 		}
 		attemptAttack(attackFlag, true, targetList);
-		System.out.println(attackFlag);
 	}
 	
 	private void checkFlags() {
