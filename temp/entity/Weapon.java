@@ -23,3 +23,4 @@ public enum Weapon {
 		this.damage = damage;
 	}
 }
+
