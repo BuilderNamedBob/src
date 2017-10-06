@@ -17,6 +17,8 @@ public class Player extends Entity {
 	
 	public static final int SIZE = 32;
 	public boolean attackFlag = false;
+	public boolean dashFlag = false;
+	public float dashTimer;
 	public float mouseAngle;
 
 	public Player() {
@@ -40,6 +42,9 @@ public class Player extends Entity {
 		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
+				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
+					dashFlag = true;
+				}			
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Main.game.paused = !Main.game.paused;
 				}
@@ -127,11 +132,21 @@ public class Player extends Entity {
 			}
 		}
 		attemptAttack(attackFlag, true, targetList);
-		System.out.println(attackFlag);
 	}
 	
 	private void checkFlags() {
 		attackFlag = false;
+		
+		// Adding a dash functionality for the player
+		if (dashFlag) {
+			if (dashTimer >= 1f) {
+				speedFactor = 1.0f;
+				dashFlag = false;
+			} else {
+				speedFactor = 4.0f;
+				dashTimer += (double)Time.getDifference() / 1000000000;
+			}
+		}
 		/*
 		Item firstItemInInventory = inventory.getContents()[0];
 		if (dropFlag && firstItemInInventory != null) {
