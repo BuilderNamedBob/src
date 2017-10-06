@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import temp.entity.Player;
 import temp.gameobject.GameObject;
+import temp.gameobject.Wall;
 import temp.utils.Utils;
 
 public class Game {
