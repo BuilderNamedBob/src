@@ -142,6 +142,7 @@ public class Player extends Entity {
 			if (dashTimer >= 1f) {
 				speedFactor = 1.0f;
 				dashFlag = false;
+				dashTimer = 0.0f;
 			} else {
 				speedFactor = 4.0f;
 				dashTimer += (double)Time.getDifference() / 1000000000;
