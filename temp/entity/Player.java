@@ -33,6 +33,12 @@ public class Player extends Entity {
 		} else {
 			yMoveVector = 0;
 		}
+		// Slow player movement speed.
+		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			speedFactor = 0.5f;
+		} else {
+			speedFactor = 1.0f;
+		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_A) && !Keyboard.isKeyDown(Keyboard.KEY_D)) {
 			xMoveVector = -1;
 		} else if (!Keyboard.isKeyDown(Keyboard.KEY_A) && Keyboard.isKeyDown(Keyboard.KEY_D)) {
@@ -42,9 +48,19 @@ public class Player extends Entity {
 		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
+<<<<<<< HEAD
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+=======
+				// Dash key.
+				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
+>>>>>>> 3a63d67bd0d381664fd809b47c883eeaf5e6a313
 					dashFlag = true;
-				}			
+				}
+				// Teleportation
+				if (Keyboard.getEventKey() == Keyboard.KEY_T) {
+					x += xMoveVector * 100;
+					y += yMoveVector * 100;
+				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Main.game.paused = !Main.game.paused;
 				}
@@ -137,7 +153,7 @@ public class Player extends Entity {
 	private void checkFlags() {
 		attackFlag = false;
 		
-		// Adding a dash functionality for the player
+		// Dash functionality for the player
 		if (dashFlag) {
 			if (dashTimer >= 0.25f) {
 				speedFactor = 1.0f;
