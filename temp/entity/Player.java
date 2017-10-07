@@ -42,13 +42,13 @@ public class Player extends Entity {
 		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
-				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
+				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
 					dashFlag = true;
 				}			
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Main.game.paused = !Main.game.paused;
 				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
 					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, Weapon.SWORD, 100));
@@ -139,7 +139,7 @@ public class Player extends Entity {
 		
 		// Adding a dash functionality for the player
 		if (dashFlag) {
-			if (dashTimer >= 1f) {
+			if (dashTimer >= 0.25f) {
 				speedFactor = 1.0f;
 				dashFlag = false;
 				dashTimer = 0.0f;
