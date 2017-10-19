@@ -8,6 +8,7 @@ import org.lwjgl.opengl.Display;
 
 import temp.engine.Main;
 import temp.game.Time;
+import temp.game.Timer;
 import temp.gameobject.GameObject;
 import temp.utils.Utils;
 
@@ -22,8 +23,7 @@ public class Enemy extends Entity {
 	private final int ROAM_MAX_PAUSE_TIME = 3;
 	private float roamX;
 	private float roamY;
-	private float roamDelay;
-	private double roamDelayTimer;
+	private Timer roamDelayTimer;
 	
 	
 	public Enemy(float x, float y, int size, boolean solid, float moveSpeed, boolean aggressive,
@@ -33,9 +33,7 @@ public class Enemy extends Entity {
 		this.detectRange = detectRange;
 		roamX = x;
 		roamY = y;
-		roamDelay = 1f;
 		attacking = false;
-		attackDelayTimer = 50f;
 	}
 	
 	public void update() {
@@ -100,13 +98,10 @@ public class Enemy extends Entity {
 	
 	private void roam() {
 		if (x == roamX && y == roamY) {
-			if (roamDelayTimer >= roamDelay) {
-				roamDelay = Utils.genRandomNumber(ROAM_MAX_PAUSE_TIME) + 1;
+			if (roamDelayTimer == null || !roamDelayTimer.isRunning()) {
+				roamDelayTimer = new Timer(Utils.genRandomNumber(ROAM_MAX_PAUSE_TIME) + 1);
 				roamX = createNewRoam(roamX, 32, Display.getWidth() - 32 - width);
 				roamY = createNewRoam(roamY, 32, Display.getHeight() - 32 - height);
-				roamDelayTimer = 0;
-			} else {
-				roamDelayTimer += (double)Time.getDifference() / 1000000000;
 			}
 		} else {
 			float initialMoveSpeed = moveSpeed * speedFactor * Time.getDelta() * ROAM_SPEED_FACTOR;

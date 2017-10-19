@@ -164,6 +164,18 @@ public final class Utils {
 		float xCentre = attacker.x + attacker.width / 2;
 		float yCentre = attacker.y + attacker.height / 2;
 		
+		//Circle of radius attackRange around the player
+		Ellipse2D e = new Ellipse2D.Float(xCentre - attacker.weapon.attackRange, yCentre - attacker.weapon.attackRange,
+												  attacker.weapon.attackRange * 2, attacker.weapon.attackRange * 2);
+		//Rectangle representing enemy hitbox
+		Rectangle r = new Rectangle((int)target.x, (int)target.y, target.width, target.height);
+		
+		//Method was rearranged and this statement added to avoid spending lots of time performing calculations
+		//when the enemy is nowhere near the player. This will speed up the game when lots of enemies exist.
+		if (!e.intersects(r)) {
+			return false;
+		}
+		
 		ArrayList<Integer> xPoints = new ArrayList<Integer>();
 		ArrayList<Integer> yPoints = new ArrayList<Integer>();
 		
@@ -187,18 +199,13 @@ public final class Utils {
 			yPointsArray[i] = yPoints.get(i);
 		}
 		
-		//Circle of radius attackRange around the player
-		Ellipse2D e = new Ellipse2D.Float(xCentre - attacker.weapon.attackRange, yCentre - attacker.weapon.attackRange,
-										  attacker.weapon.attackRange * 2, attacker.weapon.attackRange * 2);
 		//Rotated square of side length attackRange
 		Polygon p = new Polygon(xPointsArray, yPointsArray, arraySize);
-		//Rectangle representing enemy hitbox
-		Rectangle r = new Rectangle((int)target.x, (int)target.y, target.width, target.height);
 		
-		if (p.intersects(r) && e.intersects(r)) {
-			return true;
+		if (!p.intersects(r)) {
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	

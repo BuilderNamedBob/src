@@ -10,6 +10,7 @@ import org.lwjgl.opengl.Display;
 
 import temp.engine.Main;
 import temp.game.Time;
+import temp.game.Timer;
 import temp.gameobject.GameObject;
 import temp.utils.Utils;
 
@@ -17,8 +18,7 @@ public class Player extends Entity {
 	
 	public static final int SIZE = 32;
 	public boolean attackFlag = false;
-	public boolean dashFlag = false;
-	public float dashTimer;
+	public Timer dashTimer = new Timer(0.25f);
 	public float mouseAngle;
 
 	public Player() {
@@ -48,13 +48,8 @@ public class Player extends Entity {
 		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) {
-<<<<<<< HEAD
 				if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
-=======
-				// Dash key.
-				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
->>>>>>> 3a63d67bd0d381664fd809b47c883eeaf5e6a313
-					dashFlag = true;
+					dashTimer.start();
 				}
 				// Teleportation
 				if (Keyboard.getEventKey() == Keyboard.KEY_T) {
@@ -67,7 +62,7 @@ public class Player extends Entity {
 				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
 					int xSpawn = Utils.genRandomNumber(Display.getWidth() - 32);
 					int ySpawn = Utils.genRandomNumber(Display.getHeight() - 32);
-					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, Weapon.SWORD, 100));
+					Main.game.currentObjects.add(new Enemy(xSpawn, ySpawn, 32, true, 1.5f, true, 1000, false, Weapon.DAGGER, 100));
 				}
 			}
 		}
@@ -85,7 +80,7 @@ public class Player extends Entity {
 		updateMouseAngle();
 		act();
 		handleAttack();
-		checkFlags();
+		checkTimers();
 		checkTexture();
 	}
 	
@@ -150,19 +145,14 @@ public class Player extends Entity {
 		attemptAttack(attackFlag, true, targetList);
 	}
 	
-	private void checkFlags() {
+	private void checkTimers() {
 		attackFlag = false;
 		
 		// Dash functionality for the player
-		if (dashFlag) {
-			if (dashTimer >= 0.25f) {
-				speedFactor = 1.0f;
-				dashFlag = false;
-				dashTimer = 0.0f;
-			} else {
-				speedFactor = 4.0f;
-				dashTimer += (double)Time.getDifference() / 1000000000;
-			}
+		if (dashTimer.isRunning()) {
+			speedFactor = 4.0f;
+		} else {
+			speedFactor = 1.0f;
 		}
 		/*
 		Item firstItemInInventory = inventory.getContents()[0];

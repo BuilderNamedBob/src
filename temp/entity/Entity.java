@@ -9,6 +9,7 @@ import org.newdawn.slick.opengl.Texture;
 import temp.engine.Main;
 import temp.game.Game;
 import temp.game.Time;
+import temp.game.Timer;
 import temp.gameobject.GameObject;
 import temp.utils.Utils;
 
@@ -20,7 +21,8 @@ public abstract class Entity extends GameObject {
 	
 	public Weapon weapon;
 	public boolean attacking;
-	public float attackDelayTimer;
+	public Timer attackTimer;
+	public Timer attackSpeedTimer;
 	
 	public int currentHealth;
 	public int maxHealth;
@@ -39,10 +41,13 @@ public abstract class Entity extends GameObject {
 		this.maxHealth = maxHealth;
 		currentHealth = maxHealth;
 		speedFactor = 1;
+		attackTimer = new Timer(100f);
+		attackSpeedTimer = new Timer(1f / weapon.attackSpeed);
 	}
 	
 	public void attemptAttack(boolean triggerCondition, boolean damageCondition, ArrayList<Entity> damageRecipients) {
-		if (attackDelayTimer >= 1f / weapon.attackSpeed && !attacking) {
+		/*
+		if (attackTimer.progress() >= 1f / weapon.attackSpeed && !attacking) {
 			if (triggerCondition) {
 				attacking = true;
 				attackDelayTimer = 0;
@@ -50,7 +55,7 @@ public abstract class Entity extends GameObject {
 		} else {
 			attackDelayTimer += (double)Time.getDifference() / 1000000000;
 		}
-		if (attacking && attackDelayTimer >= weapon.windUpTime + weapon.attackTime) { //damage registers when they finish their swing
+		if (attacking && attackDelayTimer >= weapon.windUpTime + weapon.attackTime) { 
 			if (damageCondition) {
 				for (Entity e : damageRecipients) {
 					e.takeDamage(weapon.damage);
@@ -58,11 +63,27 @@ public abstract class Entity extends GameObject {
 			}
 			attacking = false;
 		}
+		*/
+		if (!attackTimer.isRunning() && !attackSpeedTimer.isRunning()) {
+			if (triggerCondition) {
+				attackTimer.start();
+				attackSpeedTimer.start();
+			}
+		}
+		if (attackTimer.progress() >= weapon.windUpTime + weapon.attackTime) { //damage registers when they finish their swing
+			if (damageCondition) {
+				for (Entity e : damageRecipients) {
+					e.takeDamage(weapon.damage);
+				}
+			}
+			attackTimer.reset();
+		}
+			
 	}
 	
 	public void renderTargetSector(float angle) {
-		if (attacking) {
-			if (attackDelayTimer >= weapon.windUpTime && attackDelayTimer <= weapon.windUpTime + weapon.attackTime) {
+		if (attackTimer.isRunning()) {
+			if (attackTimer.progress() >= weapon.windUpTime && attackTimer.progress() <= weapon.windUpTime + weapon.attackTime) {
 				glColor3f(1, 0, 0);
 			}
 			Utils.drawSector(x + width / 2, y + height / 2, -0.3f, weapon.attackRange, angle, 90f);

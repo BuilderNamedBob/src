@@ -18,6 +18,7 @@ public final class Time {
 	public static void update() {
 		lastFrameTime = currentTime;
 		currentTime = getTime();
+		Timer.update();
 	}
 	
 	public static float getDelta() {
